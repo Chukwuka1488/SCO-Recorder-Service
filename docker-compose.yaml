@@ -1,0 +1,9 @@
+version: '3.8'
+services:
+  web:
+    build:
+      context: .
+    image: recorder-service:3.0
+    ports:
+      - "7070:7000"
+    restart: always

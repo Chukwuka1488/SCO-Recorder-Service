@@ -1,8 +1,6 @@
 # SCO-Recorder-Service
 This project implements a recorder service designed to capture and store video frames from a Self-Checkout (SCO) camera along with metadata received from a cashier system. 
 
-Sure, here's a concise and clear description for your GitHub repository:
-
 ---
 
 ### SCO-Recorder-Service
@@ -28,18 +26,33 @@ This project implements a recorder service designed to capture and store video f
 
 #### Setup and Installation:
 1. Clone the empty repository.
-2. Set up the virtual environment and install dependencies.
+2. Have python 3.10 or higher installed
+3. Set up the virtual environment and install dependencies.
    ```bash
    python3 -m venv venv
    source venv/bin/activate
-   pip install -r requirements.txt
    ```
-3. Build and run the Docker image.
+4. Create the recorder service flask application
+5. Create simple templating using Jinja for view dynamic web pages (to see outputs)
+6. Create the python dependencies (reqirements.txt)
+```bash
+pip freeze > requirements.txt
+```
+7. Build and run the Docker image.
+- FROM python:3.12-alpine3.20
    ```bash
-   docker build -t sco-recorder-service .
-   docker run -p 8000:8000 sco-recorder-service
+   docker build -t recorder-service .
+   docker run -d -p 80:5050 --name sco-recorder-service recorder-service:1.0
    ```
-
+8. Create a Docker Compose file for ???
+```bash
+docker-compose build
+docker tag recorder-service:3.0 chukwuka1488/recorder-service:3.0
+docker login
+docker push chukwuka1488/recorder-service:3.0
+```
+9. Write kubernetes manifest files for the application
+10. Create Helm charts for ???
 #### Interview Preparation:
 Be prepared to:
 - Present and explain your solution.
