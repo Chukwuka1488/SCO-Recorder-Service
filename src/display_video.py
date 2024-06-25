@@ -9,7 +9,7 @@ class VideoDisplayer:
         capture = cv.VideoCapture(self.video_path)
         while True:
             isTrue, frame = capture.read()
-            if not isTrue:
+            if not isTrue or frame is None:
                 break
 
             frame_resized = rescale_frame(frame)
@@ -22,3 +22,4 @@ class VideoDisplayer:
 
         capture.release()
         cv.destroyAllWindows()
+

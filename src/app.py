@@ -6,6 +6,7 @@ from display_video import VideoDisplayer
 import logging
 from datetime import datetime
 from werkzeug.utils import secure_filename
+import json
 
 app = Flask(__name__)
 # Define the path to the new directory
@@ -17,14 +18,16 @@ os.makedirs(new_dir_path, exist_ok=True)
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
 
-# Directory to save the ZIP file containing the captured frames
-output_dir = 'src/output_frames'
-# Number of frames to capture
-num_frames = 20
+# Now parameterizable via environment variable
+output_dir = os.getenv('OUTPUT_DIR', 'src/output_frames')
 
+# Now parameterizable via environment variable
+num_frames = int(os.getenv('NUM_FRAMES', 20))
+
+last_uploaded_video = None
 
 # Function to get hostname and IP
-def fetchDetails():
+def fetch_details():
     try:
         hostname = socket.gethostname()
         ip = socket.gethostbyname(hostname)
@@ -46,12 +49,13 @@ def health():
 
 @app.route("/details")
 def details():
-    hostname, ip = fetchDetails()
+    hostname, ip = fetch_details()
     return render_template('index.html', HOSTNAME=hostname, IP=ip)
 
 
 @app.route('/upload_metadata', methods=['POST'])
 def upload_metadata():
+    global last_uploaded_video
     # Check if the post request has the file part
     if 'file' not in request.files:
         return jsonify({"error": "No file part"}), 400
@@ -64,6 +68,7 @@ def upload_metadata():
         filename = secure_filename(file.filename)
         video_path = os.path.join(new_dir_path, filename)  # Use the new directory path
         file.save(video_path)
+        last_uploaded_video = video_path
 
     metadata = {
         "cashier_id": request.form.get('cashier_id'),
@@ -93,8 +98,28 @@ def upload_metadata():
         # Create a timestamped ZIP file name
         zip_name = video_processor.timestamped_zip_name()
 
+        # Add the ZIP file name to the metadata
+        metadata['zip_name'] = zip_name
+
         # Create the ZIP file with frames and metadata
         zip_path = video_processor.create_zip(output_dir, zip_name, encoded_frames, metadata)
+
+        # Read existing data from the JSON file
+        json_file_path = os.path.join(output_dir, 'metadata.json')
+        if os.path.exists(json_file_path):
+            with open(json_file_path, 'r') as f:
+                existing_data = json.load(f)
+                if not isinstance(existing_data, list):  # Check if existing_data is not a list
+                    existing_data = []  # Initialize existing_data to an empty list
+        else:
+            existing_data = []
+
+        # Append the new metadata to the existing data
+        existing_data.append(metadata)
+
+        # Write the updated data back to the JSON file
+        with open(json_file_path, 'w') as f:
+            json.dump(existing_data, f)
 
         app.logger.debug(f"ZIP file created: {zip_path}")
 
@@ -115,18 +140,16 @@ def show_result():
     return render_template('result.html', ZIP_PATH=zip_path)
 
 
-@app.route('/display_video', methods=['POST'])
+@app.route('/display_video', methods=['GET', 'POST'])
 def display_video():
-    data = request.json
-    video_path = data.get('video_path')
+    global last_uploaded_video  # Use the global variable
+    if not last_uploaded_video:
+        return jsonify({"error": "No video has been uploaded yet"}), 400
 
-    if not video_path:
-        return jsonify({"error": "video_path is required"}), 400
-
-    app.logger.debug(f"Received request to display video: {video_path}")
+    app.logger.debug(f"Received request to display video: {last_uploaded_video}")
 
     # Display the video (not necessary for frame capturing)
-    video_displayer = VideoDisplayer(video_path)
+    video_displayer = VideoDisplayer(last_uploaded_video)
     video_displayer.display_video()
 
     return jsonify({"message": "Video displayed"}), 200
