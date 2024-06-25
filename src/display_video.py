@@ -1,28 +1,24 @@
 import cv2 as cv
 from rescale import rescale_frame
 
+class VideoDisplayer:
+    def __init__(self, video_path):
+        self.video_path = video_path
 
-def display_video(video_path):
-    """
-    Displays the video specified by the `video_path` and a resized version of it.
+    def display_video(self):
+        capture = cv.VideoCapture(self.video_path)
+        while True:
+            isTrue, frame = capture.read()
+            if not isTrue:
+                break
 
-    Parameters:
-    - video_path (str): Path to the video file.
-    """
-    capture = cv.VideoCapture(video_path)
+            frame_resized = rescale_frame(frame)
 
-    while True:
-        isTrue, frame = capture.read()
-        if not isTrue:
-            break
+            cv.imshow('Video', frame)
+            cv.imshow('Video Resized', frame_resized)
 
-        frame_resized = rescale_frame(frame)
+            if cv.waitKey(20) & 0xFF == ord('d'):
+                break
 
-        cv.imshow('Video', frame)
-        cv.imshow('Video Resized', frame_resized)
-
-        if cv.waitKey(20) & 0xFF == ord('d'):
-            break
-
-    capture.release()
-    cv.destroyAllWindows()
+        capture.release()
+        cv.destroyAllWindows()

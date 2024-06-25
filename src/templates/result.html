@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Video Processing Result</title>
+</head>
+<body>
+    <h3>Video Processing Result</h3>
+    {% if ZIP_PATH %}
+        <p>The ZIP file with the last 20 frames has been created successfully.</p>
+        <p>File Path: <strong>{{ ZIP_PATH }}</strong></p>
+    {% else %}
+        <p>There was an error processing the video. No ZIP file was created.</p>
+    {% endif %}
+</body>
+</html>
