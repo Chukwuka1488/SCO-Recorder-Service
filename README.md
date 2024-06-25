@@ -51,6 +51,17 @@ docker tag recorder-service:3.0 chukwuka1488/recorder-service:3.0
 docker login
 docker push chukwuka1488/recorder-service:3.0
 ```
+
+9. View the stored output
+```bash
+docker ps
+docker exec -it container_id /bin/sh
+cd src
+cd output_frame
+ls -l
+```
+
+###### NOT DONE YET
 9. Write kubernetes manifest files for the application
 10. Create Helm charts for ???
 #### Interview Preparation:
