@@ -11,4 +11,4 @@ spec:
       port: 7070
       # By default and for convenience, the `targetPort` is set to
       # the same value as the `port` field.
-      targetPort: 7000
+      targetPort: 7100

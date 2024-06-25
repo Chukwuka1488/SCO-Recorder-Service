@@ -18,4 +18,4 @@ spec:
       - name: recorder
         image: chukwuka1488/recorder-service:3.0
         ports:
-        - containerPort: 7000
+        - containerPort: 7100

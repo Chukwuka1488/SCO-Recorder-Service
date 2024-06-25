@@ -5,5 +5,5 @@ services:
       context: .
     image: recorder-service:3.0
     ports:
-      - "7070:7000"
+      - "7070:7100"
     restart: always
