@@ -7,3 +7,9 @@ services:
     ports:
       - "7070:7100"
     restart: always
+#     volumes:
+#       - myvolume:/app/data
+#     restart: always
+
+# volumes:
+#   myvolume:
